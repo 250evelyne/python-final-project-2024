@@ -2,7 +2,7 @@
 
 ## Project Description
 
-The Recipe Manager and Meal Planner is a web application designed to help users store, manage, and plan their meals efficiently. The application allows users to save their favorite recipes, categorize them by type (e.g., breakfast, lunch, dinner), and generate meal plans on a weekly or daily basis. The app also includes a feature for automatically generating shopping lists based on the meal plan, and it can calculate nutritional information for each recipe, making meal planning both convenient and health-conscious.
+The Recipe Manager and Meal Planner is a web application designed to help users store, manage, and plan their meals efficiently based in their nutritional interests(gaining weight, losing weight). The application allows users to save their favorite recipes, categorize them by type (e.g., breakfast, lunch, dinner, snacks), and generate meal plans on a weekly or daily basis. The app also includes a feature for automatically generating shopping lists based on the meal plan, and it can calculate nutritional information for each recipe, making meal planning both convenient and health-conscious.
 
 ## Main Idea
 
@@ -58,4 +58,4 @@ Here’s the proposed timeline for the development of the Recipe Manager and Mea
   - Prepare for project presentation
   
 - **Week 14**: Final project presentation
-  - Present the Recipe Manager and Meal Planner to classmates and instructor, showcasing the main features (recipe storage, meal planner, shopping list generator, etc.)
+  - Present the Recipe Manager and Meal planner, showcasing the main features as  a form of exhibition of the skills that i acquired throughout the whole project (recipe storage, meal planner, shopping list generator, etc.)
