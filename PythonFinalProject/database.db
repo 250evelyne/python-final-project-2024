@@ -1,0 +1,212 @@
+import sqlite3
+import hashlib
+import os
+from cryptography.fernet import Fernet
+from datetime import datetime
+import logging
+from dotenv import load_dotenv
+
+class DatabaseManager:
+    def __init__(self, database_name='recipe_platform.db'):
+        # Load environment variables
+        load_dotenv()
+
+
+        logging.basicConfig(filename='app_logs.log', level=logging.INFO,
+                            format='%(asctime)s - %(levelname)s - %(message)s')
+        self.logger = logging.getLogger(__name__)
+
+        # Database configuration
+        self.database_name = database_name
+
+        # Encryption setup
+        self.setup_encryption()
+
+
+        self.create_tables()
+
+    def setup_encryption(self):
+
+        encryption_key = os.getenv('RECIPE_APP_ENCRYPTION_KEY')
+
+        if not encryption_key:
+
+            encryption_key = Fernet.generate_key()
+            print(f"⚠️ No encryption key found. Generated new key: {encryption_key}")
+            os.environ['RECIPE_APP_ENCRYPTION_KEY'] = encryption_key.decode()
+
+
+        self.encryption_key = encryption_key.encode() if isinstance(encryption_key, str) else encryption_key
+        self.cipher_suite = Fernet(self.encryption_key)
+
+    def encrypt_data(self, data):
+        """Encryptin for sensitive data"""
+        try:
+            print(f"🔒 Encrypting data: {data[:5]}...")  # Partial data display for security
+            encrypted_data = self.cipher_suite.encrypt(data.encode())
+            return encrypted_data.decode()
+        except Exception as e:
+            self.logger.error(f"Encryption error: {e}")
+            return None
+
+    def decrypt_data(self, encrypted_data):
+        """Decrypt sensitive data"""
+        try:
+            print(f"🔓 Decrypting data: {encrypted_data[:5]}...")  # Partial data display
+            decrypted_data = self.cipher_suite.decrypt(encrypted_data.encode())
+            return decrypted_data.decode()
+        except Exception as e:
+            self.logger.error(f"Decryption error: {e}")
+            return None
+
+    def create_connection(self):
+        """Create a database connection and return it"""
+        try:
+            conn = sqlite3.connect(self.database_name)
+            conn.row_factory = sqlite3.Row  # Allow accessing columns by name
+            return conn
+        except sqlite3.Error as e:
+            self.logger.error(f"Database connection error: {e}")
+            return None
+
+    def create_tables(self):
+        """Create the necessary tables for the recipe platform"""
+        tables = [
+            """CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                encrypted_password TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );""",
+            """CREATE TABLE IF NOT EXISTS recipes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                title TEXT NOT NULL,
+                ingredients TEXT,
+                instructions TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            );""",
+            """CREATE TABLE IF NOT EXISTS meal_plans (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                plan_date DATE,
+                recipe_id INTEGER,
+                meal_type TEXT,
+                FOREIGN KEY(user_id) REFERENCES users(id),
+                FOREIGN KEY(recipe_id) REFERENCES recipes(id)
+            );""",
+            """CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                message TEXT,
+                is_read BOOLEAN DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            );"""
+        ]
+
+        try:
+            with self.create_connection() as conn:
+                for table_query in tables:
+                    conn.execute(table_query)
+                conn.commit()
+            print("✅ Database tables created successfully")
+            self.logger.info("Tables created successfully")
+        except sqlite3.Error as e:
+            print(f"❌ Error creating tables: {e}")
+            self.logger.error(f"Error creating tables: {e}")
+
+    def add_user(self, username, password):
+        """Add a new user to the database"""
+        print(f"📝 Attempting to add user: {username}")
+
+
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        encrypted_password = self.encrypt_data(hashed_password)
+
+        sql = "INSERT INTO users (username, encrypted_password) VALUES (?, ?);"
+        try:
+            with self.create_connection() as conn:
+                conn.execute(sql, (username, encrypted_password))
+                conn.commit()
+                user_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+                # Add welcome notification
+                self.add_notification(user_id, f"Welcome {username} to Yummy Recipes!")
+
+                print(f"✅ User {username} added successfully")
+                self.logger.info(f"User {username} added successfully")
+                return user_id
+        except sqlite3.Error as e:
+            print(f"❌ Error adding user: {e}")
+            self.logger.error(f"Error adding user: {e}")
+            return None
+
+    def validate_user(self, username, password):
+        """Check if username and password match"""
+        print(f"🔍 Validating user: {username}")
+
+
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
+        sql = "SELECT * FROM users WHERE username = ?;"
+        try:
+            with self.create_connection() as conn:
+                cursor = conn.execute(sql, (username,))
+                user = cursor.fetchone()
+
+                if user:
+
+                    decrypted_password = self.decrypt_data(user['encrypted_password'])
+
+                    if decrypted_password == hashed_password:
+                        print(f"✅ User {username} validated successfully")
+                        return dict(user)
+
+                print(f"❌ Validation failed for user: {username}")
+                return None
+        except sqlite3.Error as e:
+            print(f"❌ Error validating user: {e}")
+            self.logger.error(f"Error validating user: {e}")
+            return None
+
+    def add_recipe(self, user_id, title, ingredients, instructions):
+        """Add a new recipe for a user"""
+        print(f"📝 Adding recipe: {title} for user {user_id}")
+
+        sql = """
+        INSERT INTO recipes (user_id, title, ingredients, instructions)
+        VALUES (?, ?, ?, ?)
+        """
+        try:
+            with self.create_connection() as conn:
+                conn.execute(sql, (user_id, title, ingredients, instructions))
+                conn.commit()
+                print(f"✅ Recipe '{title}' added successfully")
+                self.logger.info(f"Recipe '{title}' added for user {user_id}")
+
+
+                self.add_notification(user_id, f"New recipe '{title}' added to your collection!")
+
+                return True
+        except sqlite3.Error as e:
+            print(f"❌ Error adding recipe: {e}")
+            self.logger.error(f"Error adding recipe: {e}")
+            return False
+
+
+
+
+if __name__ == "__main__":
+
+    db = DatabaseManager()
+
+
+    user_id = db.add_user("evelyne", "securepassword")
+
+
+    if user_id:
+        db.add_recipe(user_id, "Pasta Carbonara",
+                      "Pasta, Eggs, Cheese, Pancetta",
+                      "1. Cook pasta\n2. Prepare sauce\n3. Combine and serve")

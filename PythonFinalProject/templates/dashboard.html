@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yummy Recipes 🍲</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFF0F5;
+            font-family: 'Comic Sans MS', cursive;
+        }
+        .dashboard-container {
+            background-color: #FFFFFF;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
+            padding: 30px;
+            margin-top: 50px;
+            border: 3px solid #FFB6C1;
+        }
+        .nav-pills .nav-link {
+            color: #FF69B4;
+            transition: all 0.3s ease;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #FF69B4 !important;
+            color: white;
+        }
+        .nav-pills .nav-link:hover {
+            transform: scale(1.05);
+        }
+        .recipe-card {
+            background-color: #FFF5EE;
+            border: 2px dashed #FF69B4;
+            border-radius: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .recipe-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.2);
+        }
+        .recipe-card.selected {
+            border-color: #FF1493;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+        }
+        .cute-icons {
+            font-size: 1.5rem;
+        }
+        .modal-header {
+            background-color: #FFB6C1;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container dashboard-container">
+        <div class="text-center mb-4">
+            <h1 style="color: #FF69B4;">🍰 Yummy Recipes Planner 🥐</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-3 border-end">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#recipes" data-bs-toggle="tab">
+                            🍳 My Recipes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#meal-plan" data-bs-toggle="tab">
+                            📅 Meal Planner
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#shopping-list" data-bs-toggle="tab">
+                            🛒 Shopping List
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#recipe-inspiration" data-bs-toggle="tab">
+                            💖 Recipe Inspiration
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <!-- Recipes Tab -->
+                    <div class="tab-pane active" id="recipes">
+                        <h2 style="color: #FF69B4;">My Adorable Recipes 🧁</h2>
+                        <div id="recipeContainer" class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="card recipe-card cute-icons">
+                                    <span class="position-absolute top-0 end-0 p-2">
+                                        <span class="favorite-icon">🤍</span>
+                                    </span>
+                                    <img src="{{ url_for('static', filename='images/pancakes.jpeg') }}" class="card-img-top" alt="Cute Recipe">
+                                    <div class="card-body">
+                                        <h5>Fluffy Pancakes 🥞</h5>
+                                        <p>Soft, sweet morning delight!</p>
+                                        <div class="d-flex justify-content-between">
+                                            <span>⏰ 20 mins</span>
+                                            <span>✅ Cooked</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="background-color: #FF69B4; border: none;" data-bs-toggle="modal" data-bs-target="#addRecipeModal">
+                            + Add Cute Recipe
+                        </button>
+                    </div>
+
+                    <!-- Meal Planner Tab -->
+                    <div class="tab-pane" id="meal-plan">
+                        <h2 style="color: #FF69B4;">Weekly Yummy Plan 📆</h2>
+                        <table class="table table-bordered" style="border-color: #FFB6C1;" id="mealPlanTable">
+                            <thead>
+                                <tr style="background-color: #FFF0F5;">
+                                    <th>Day</th>
+                                    <th>Breakfast</th>
+                                    <th>Lunch</th>
+                                    <th>Dinner</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Monday</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                                    </td>
+                                </tr>
+                            <tr>
+                                    <td>Tuesday</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                                    </td>
+                                </tr>
+                            <tr>
+                                    <td>Wednesday</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                                    </td>
+                                </tr>
+                            <tr>
+                                    <td>Thursday</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                                    </td>
+                                </tr>
+                            <tr>
+                                    <td>Friday</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                                    </td>
+                                </tr>
+                            <tr>
+                                    <td>Sarturday</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                                    </td>
+                                </tr>
+                            <tr>
+                                    <td>Sunday</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Shopping List Tab -->
+                    <div class="tab-pane" id="shopping-list">
+                        <h2 style="color: #FF69B4;">Shopping List 🛒</h2>
+                        <ul class="list-group" id="shoppingListContainer">
+
+                        </ul>
+                    </div>
+
+                    <!-- Recipe Inspiration Tab -->
+                    <div class="tab-pane" id="recipe-inspiration">
+                        <h2 style="color: #FF69B4;">Recipe Inspiration 💖</h2>
+                        <div class="row" id="inspirationRecipes">
+                            <div class="col-md-4 mb-4">
+                                <div class="card recipe-card" data-name="Classic Chocolate Cake" data-ingredients="Flour, Cocoa, Sugar, Eggs, Butter" data-cooking-time="1 hour" data-difficulty="Intermediate">
+                                    <img src="{{ url_for('static', filename='images/chocolate cake.jpeg') }}" class="card-img-top" alt="Chocolate Cake">
+                                    <div class="card-body">
+                                        <h5>Classic Chocolate Cake 🍫</h5>
+                                        <p>Rich, decadent chocolate cake perfect for any occasion</p>
+                                        <div class="d-flex justify-content-between">
+                                            <span>⏰ 1 hour</span>
+                                            <span>🔥 Intermediate</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card recipe-card" data-name="Creamy Veggie Pasta" data-ingredients="Pasta, Mixed Vegetables, Cream, Herbs" data-cooking-time="30 mins" data-difficulty="Easy">
+                                    <img src="{{ url_for('static', filename='images/veggiepasta.jpeg') }}" class="card-img-top" alt="Veggie Pasta">
+                                    <div class="card-body">
+                                        <h5>Creamy Veggie Pasta 🥬</h5>
+                                        <p>Colorful pasta packed with fresh vegetables</p>
+                                        <div class="d-flex justify-content-between">
+                                            <span>⏰ 30 mins</span>
+                                            <span>🌱 Vegetarian</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card recipe-card" data-name="Smoothie Bowl" data-ingredients="Mixed Berries, Banana, Yogurt, Granola, Honey" data-cooking-time="15 mins" data-difficulty="Easy">
+                                    <img src="{{ url_for('static', filename='images/smothiebowl.jpeg') }}" class="card-img-top" alt="Smoothie Bowl">
+                                    <div class="card-body">
+                                        <h5> Smoothie Bowl</h5>
+                                        <p>Nutritious and Instagram-worthy breakfast</p>
+                                        <div class="d-flex justify-content-between">
+                                            <span>⏰ 15 mins</span>
+                                            <span>🥗 Healthy</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Recipe Modal -->
+    <div class="modal fade" id="addRecipeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Recipe 🥘</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="recipeForm">
+                        <div class="mb-3">
+                            <label class="form-label">Recipe Name 📝</label>
+                            <input type="text" class="form-control" id="recipeName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ingredients 🥬</label>
+                            <textarea class="form-control" id="recipeIngredients" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Instructions 👩‍🍳</label>
+                            <textarea class="form-control" id="recipeInstructions" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Cooking Time ⏰</label>
+                                <input type="text" class="form-control" id="cookingTime">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Difficulty 🌶️</label>
+                                <select class="form-select" id="recipeDifficulty">
+                                    <option>Easy</option>
+                                    <option>Medium</option>
+                                    <option>Hard</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" style="background-color: #FF69B4; border: none;" onclick="addRecipe()">Save Recipe</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meal Edit Modal -->
+    <div class="modal fade" id="editMealModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Meal Plan 📝</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="mealEditForm">
+                        <input type="hidden" id="editMealDay">
+                        <div class="mb-3">
+                            <label class="form-label">Breakfast</label>
+                            <input type="text" class="form-control" id="editBreakfast">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Lunch</label>
+                            <input type="text" class="form-control" id="editLunch">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dinner</label>
+                            <input type="text" class="form-control" id="editDinner">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" style="background-color: #FF69B4; border: none;" onclick="saveMealChanges()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+   <script>
+
+    function addShoppingListItem() {
+        const itemInput = document.getElementById('shoppingItemInput');
+        const quantityInput = document.getElementById('shoppingItemQuantity');
+        const shoppingListContainer = document.getElementById('shoppingListContainer');
+
+        if (itemInput && quantityInput && itemInput.value.trim() !== '') {
+            const newItem = document.createElement('li');
+            newItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+            newItem.innerHTML = `
+                ${itemInput.value}
+                <span class="badge bg-primary rounded-pill">${quantityInput.value || '1'}</span>
+                <button class="btn btn-sm btn-danger ms-2 remove-item-btn">Remove</button>
+            `;
+
+
+            const removeBtn = newItem.querySelector('.remove-item-btn');
+            removeBtn.addEventListener('click', () => {
+                shoppingListContainer.removeChild(newItem);
+            });
+
+            shoppingListContainer.appendChild(newItem);
+
+
+            itemInput.value = '';
+            quantityInput.value = '';
+        }
+    }
+
+
+    function editMealPlan(row) {
+        const day = row.querySelector('td:first-child').textContent;
+        const breakfast = row.querySelector('td:nth-child(2)').textContent;
+        const lunch = row.querySelector('td:nth-child(3)').textContent;
+        const dinner = row.querySelector('td:nth-child(4)').textContent;
+
+
+        document.getElementById('editMealDay').value = day;
+        document.getElementById('editBreakfast').value = breakfast.replace(/^[^a-zA-Z]+/, '');
+        document.getElementById('editLunch').value = lunch.replace(/^[^a-zA-Z]+/, '');
+        document.getElementById('editDinner').value = dinner.replace(/^[^a-zA-Z]+/, '');
+
+
+        new bootstrap.Modal(document.getElementById('editMealModal')).show();
+    }
+
+
+    function saveMealChanges() {
+        const day = document.getElementById('editMealDay').value;
+        const breakfast = document.getElementById('editBreakfast').value;
+        const lunch = document.getElementById('editLunch').value;
+        const dinner = document.getElementById('editDinner').value;
+
+        const rows = document.getElementById('mealPlanTable').getElementsByTagName('tbody')[0].rows;
+        for (let row of rows) {
+            if (row.querySelector('td:first-child').textContent === day) {
+                row.querySelector('td:nth-child(2)').textContent = `🥞 ${breakfast}`;
+                row.querySelector('td:nth-child(3)').textContent = `🥗 ${lunch}`;
+                row.querySelector('td:nth-child(4)').textContent = `🍽️ ${dinner}`;
+                break;
+            }
+        }
+
+
+        bootstrap.Modal.getInstance(document.getElementById('editMealModal')).hide();
+    }
+
+
+    function addMealPlanRow() {
+        const table = document.getElementById('mealPlanTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const existingDays = Array.from(table.rows).map(row => row.cells[0].textContent);
+        const availableDay = days.find(day => !existingDays.includes(day));
+
+        if (availableDay) {
+            newRow.innerHTML = `
+                <td>${availableDay}</td>
+                <td>🥞 Breakfast</td>
+                <td>🥗 Lunch</td>
+                <td>🍽️ Dinner</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary edit-meal-btn">Edit</button>
+                </td>
+            `;
+
+            // Add edit functionality to the new row's edit button
+            const editBtn = newRow.querySelector('.edit-meal-btn');
+            editBtn.addEventListener('click', () => editMealPlan(newRow));
+        } else {
+            alert('All days have been added!');
+        }
+    }
+
+function addRecipe() {
+
+    const recipeName = document.getElementById('recipeName').value.trim();
+    const recipeIngredients = document.getElementById('recipeIngredients').value.trim();
+    const recipeInstructions = document.getElementById('recipeInstructions').value.trim();
+    const cookingTime = document.getElementById('cookingTime').value.trim();
+    const recipeDifficulty = document.getElementById('recipeDifficulty').value;
+
+
+    if (!recipeName || !recipeIngredients || !recipeInstructions) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+
+    const recipeContainer = document.getElementById('recipeContainer');
+    const newRecipeCard = document.createElement('div');
+    newRecipeCard.classList.add('col-md-4', 'mb-4');
+    newRecipeCard.innerHTML = `
+        <div class="card recipe-card cute-icons">
+            <span class="position-absolute top-0 end-0 p-2">
+                <span class="favorite-icon">🤍</span>
+            </span>
+            <div class="card-body">
+                <h5>${recipeName}</h5>
+                <p>${recipeInstructions.substring(0, 50)}${recipeInstructions.length > 50 ? '...' : ''}</p>
+                <div class="d-flex justify-content-between">
+                    <span>⏰ ${cookingTime || 'N/A'}</span>
+                    <span>🔥 ${recipeDifficulty}</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+
+    recipeContainer.appendChild(newRecipeCard);
+
+
+    const addRecipeModal = bootstrap.Modal.getInstance(document.getElementById('addRecipeModal'));
+    addRecipeModal.hide();
+
+
+    document.getElementById('recipeForm').reset();
+}
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const addShoppingBtn = document.createElement('button');
+        addShoppingBtn.className = 'btn btn-sm btn-primary mt-2';
+        addShoppingBtn.textContent = '+ Add Item';
+        addShoppingBtn.onclick = addShoppingListItem;
+
+        const shoppingListContainer = document.getElementById('shoppingListContainer');
+        const addShoppingInputContainer = document.createElement('div');
+        addShoppingInputContainer.innerHTML = `
+            <div class="input-group mt-2">
+                <input type="text" class="form-control" id="shoppingItemInput" placeholder="Item name">
+                <input type="text" class="form-control" id="shoppingItemQuantity" placeholder="Quantity">
+                <button class="btn btn-primary" onclick="addShoppingListItem()">Add</button>
+            </div>
+        `;
+        shoppingListContainer.after(addShoppingInputContainer);
+
+
+
+
+        const editMealBtns = document.querySelectorAll('.edit-meal-btn');
+        editMealBtns.forEach(btn => {
+            btn.addEventListener('click', () => editMealPlan(btn.closest('tr')));
+        });
+    });
+</script>
+
+<script>
+
+    const calorieData = {
+        // Proteins
+        'chicken breast': 165,       // per 100g
+        'salmon': 208,                // per 100g
+        'tofu': 144,                  // per 100g
+        'eggs': 155,                  // per 100g (2 large eggs)
+        'beef': 250,                  // per 100g
+        'turkey': 189,                // per 100g
+
+        // Grains
+        'white rice': 130,            // per 100g
+        'brown rice': 111,            // per 100g
+        'pasta': 131,                 // per 100g
+        'bread': 265,                 // per 100g
+        'quinoa': 120,                // per 100g
+
+        // Fruits
+        'apple': 52,                  // per 100g
+        'banana': 89,                 // per 100g
+        'orange': 47,                 // per 100g
+        'strawberries': 32,           // per 100g
+        'mango': 60,                  // per 100g
+
+        // Vegetables
+        'broccoli': 34,               // per 100g
+        'spinach': 23,                // per 100g
+        'carrots': 41,                // per 100g
+        'potato': 77,                 // per 100g
+        'tomato': 18,                 // per 100g
+
+        // Dairy
+        'milk': 42,                   // per 100ml
+        'yogurt': 61,                 // per 100g
+        'cheese': 402,                // per 100g
+
+        // Snacks and Extras
+        'chocolate': 546,             // per 100g
+        'peanuts': 567,               // per 100g
+        'almonds': 579,               // per 100g
+        'olive oil': 884              // per 100g
+    };
+
+
+    function logout() {
+
+        window.location.href = 'index.html';
+
+
+
+    }
+
+
+    class MealTracker {
+        constructor() {
+            this.dishes = [];
+            this.totalCalories = 0;
+        }
+
+        addDish(food, quantity) {
+            const matchedFood = this.findClosestFood(food);
+
+            if (matchedFood) {
+                const baseCalories = calorieData[matchedFood];
+                const calculatedCalories = (baseCalories / 100) * quantity;
+
+                const dish = {
+                    name: matchedFood,
+                    quantity: quantity,
+                    calories: calculatedCalories
+                };
+
+                this.dishes.push(dish);
+                this.updateTotalCalories();
+                this.renderDishes();
+                return true;
+            }
+            return false;
+        }
+
+        findClosestFood(food) {
+            const searchTerm = food.toLowerCase().trim();
+            return Object.keys(calorieData).find(f =>
+                f.includes(searchTerm) || searchTerm.includes(f)
+            );
+        }
+
+        updateTotalCalories() {
+            this.totalCalories = this.dishes.reduce((sum, dish) => sum + dish.calories, 0);
+            document.getElementById('total-calories').textContent = this.totalCalories.toFixed(2);
+        }
+
+        renderDishes() {
+            const dishList = document.getElementById('dish-list');
+            dishList.innerHTML = '';
+
+            this.dishes.forEach((dish, index) => {
+                const dishItem = document.createElement('div');
+                dishItem.className = 'alert alert-info d-flex justify-content-between align-items-center';
+                dishItem.innerHTML = `
+                    <span>${dish.name} (${dish.quantity}g): ${dish.calories.toFixed(2)} calories</span>
+                    <button class="btn btn-sm btn-danger" onclick="mealTracker.removeDish(${index})">Remove</button>
+                `;
+                dishList.appendChild(dishItem);
+            });
+        }
+
+        removeDish(index) {
+            this.dishes.splice(index, 1);
+            this.updateTotalCalories();
+            this.renderDishes();
+        }
+
+        clearAll() {
+            this.dishes = [];
+            this.totalCalories = 0;
+            document.getElementById('total-calories').textContent = '0';
+            this.renderDishes();
+        }
+    }
+
+
+    let mealTracker;
+
+
+    function addDish() {
+        const foodItem = document.getElementById('food-item').value;
+        const quantity = document.getElementById('food-quantity').value;
+        const resultDiv = document.getElementById('calorie-result');
+
+        if (!foodItem || !quantity) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    Please enter both food item and quantity.
+                </div>
+            `;
+            return;
+        }
+
+        const added = mealTracker.addDish(foodItem, parseFloat(quantity));
+
+        if (!added) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-warning">
+                    Food item not found. Try these options:
+                    <br>${Object.keys(calorieData).slice(0, 10).join(', ')}...
+                </div>
+            `;
+        } else {
+
+            document.getElementById('food-item').value = '';
+            document.getElementById('food-quantity').value = '';
+            resultDiv.innerHTML = '';
+        }
+    }
+
+
+    function addLogoutButton() {
+        const navElement = document.querySelector('.nav');
+        if (navElement) {
+            const logoutButton = document.createElement('a');
+            logoutButton.href = 'index.html';
+            logoutButton.className = 'nav-link';
+            logoutButton.textContent = 'Logout 🚪';
+            logoutButton.onclick = function(e) {
+                e.preventDefault();
+                logout();
+            };
+            navElement.appendChild(logoutButton);
+        }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const calorieTrackerHTML = `
+            <div class="container mt-4" id="calorie-tracker">
+                <h3>🍽️ Meal Calorie Tracker</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" id="food-item" class="form-control mb-2" placeholder="Enter food item (e.g., chicken breast)">
+                    </div>
+                    <div class="col-md-6">
+                        <input type="number" id="food-quantity" class="form-control mb-2" placeholder="Quantity (in grams)">
+                    </div>
+                </div>
+                <button onclick="addDish()" class="btn btn-primary mb-3">Add Dish</button>
+
+                <div id="calorie-result" class="mb-3"></div>
+
+                <div id="dish-list" class="mb-3"></div>
+
+                <div class="alert alert-success">
+                    Total Calories: <span id="total-calories">0</span>
+                </div>
+
+                <button onclick="mealTracker.clearAll()" class="btn btn-danger">Clear All</button>
+
+                <div class="mt-3 text-muted small">
+                    <p>Tip: Enter specific food names like 'chicken breast', 'brown rice', etc.</p>
+                </div>
+            </div>
+        `;
+
+
+        const bodyElement = document.body;
+        const trackerDiv = document.createElement('div');
+        trackerDiv.innerHTML = calorieTrackerHTML;
+        bodyElement.appendChild(trackerDiv);
+
+
+        mealTracker = new MealTracker();
+
+
+        addLogoutButton();
+    });
+</script>
+</body>
+</html>
