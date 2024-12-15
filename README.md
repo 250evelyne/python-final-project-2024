@@ -6,4 +6,7 @@
 This repository contains my final project for the Script language(Python course).
 
 - `proposal.md`: Project proposal
-- `project_exploration.ipynb`: Jupyter notebook for project exploration and prototyping 
+- `project_exploration.ipynb`: Jupyter notebook for project exploration and prototyping
+-  `SOLUTIONS.md`: the file for problems i encountered and how i solved them
+-  'PythonFinalProject' : the folder that contains all the files that i have in my project
+- 
